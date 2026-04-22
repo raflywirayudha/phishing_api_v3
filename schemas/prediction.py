@@ -9,3 +9,6 @@ class PredictionResponse(BaseModel):
     layer: str
     probability: float
     total_server_latency_ms: Optional[float] = None
+    domain: Optional[str] = None
+    subdomain: Optional[str] = None
+    ml_features: Optional[list] = None
