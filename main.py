@@ -22,7 +22,7 @@ async def root():
     }
 
 # Paralel
-@app.post("/predict", response_model=PredictionResponse)
+@app.post("/scan", response_model=PredictionResponse)
 async def predict_phishing(request: URLRequest, fastapi_req: Request):
     url = request.url
     
@@ -73,7 +73,7 @@ async def predict_phishing(request: URLRequest, fastapi_req: Request):
                 print(f"🚩 {registered_domain} terdeteksi sebagai Private Suffix (PaaS). Wajib analisis ML.")
 
             res = {
-                "status": "phishing" if ml_data["probability"] > 0.4 else "safe",
+                "status": "phishing" if ml_data["probability"] > 0.8 else "safe",
                 "layer": "ml",
                 "probability": round(ml_data["probability"], 4),
                 "ml_features": ml_data["features"],
