@@ -1,0 +1,34 @@
+# === Python ===
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# === Environment Variables & Secrets ===
+# File yang berisi kunci API atau database bersifat rahasia
+.env
+config.js
+
+# === OS Specific ===
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# === Web / Extension ===
+node_modules/
+.vscode/
+.idea/
+*.log
