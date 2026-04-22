@@ -12,10 +12,16 @@ class PhishingPredictor:
             "is_https", "slash_cnt", "entropy", "path_len", "query_len"
         ]
 
-    def predict(self, url: str) -> float:
+    def predict(self, url: str):
         features = extract_features(url)
+
+        feature_map = [
+            {"Feature": name, "Value": val} 
+            for name, val in zip(self.feature_names, features)
+        ]
         dmatrix = xgb.DMatrix([features], feature_names=self.feature_names)
-        return float(self.model.predict(dmatrix)[0])
+        prob = float(self.model.predict(dmatrix)[0])
+        return {"probability": prob, "features": feature_map}
 
 # Inisialisasi model
-ml_engine = PhishingPredictor("models/phishing_model.json")
+ml_engine = PhishingPredictor("models/model.json")
