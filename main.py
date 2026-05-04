@@ -1,7 +1,6 @@
 import time
 import asyncio
 from fastapi import FastAPI, Request
-from urllib.parse import urlparse
 import tldextract
 from core.lifespan import lifespan
 from schemas.prediction import URLRequest, PredictionResponse
@@ -49,7 +48,7 @@ async def predict_phishing(request: URLRequest, fastapi_req: Request):
         ]
         
         # Menunggu semua hasil selesai dikumpulkan
-        is_blacklisted, is_whitelisted_raw, ml_data = await asyncio.gather(*tasks)
+        is_blacklisted, is_whitelisted, ml_data = await asyncio.gather(*tasks)
 
         # Logika priotitas keputusan
         # Walaupun semua hasil sudah ada, kita tetap mengikuti aturan prioritas:
@@ -59,7 +58,7 @@ async def predict_phishing(request: URLRequest, fastapi_req: Request):
                 "layer": "blacklist", 
                 "probability": 1.0
             }
-        elif is_whitelisted_raw and not ext.is_private:
+        elif is_whitelisted and not ext.is_private:
             res = {
                 "status": "safe", 
                 "layer": "whitelist", 
@@ -76,12 +75,12 @@ async def predict_phishing(request: URLRequest, fastapi_req: Request):
                 "status": "phishing" if ml_data["probability"] > 0.7 else "safe",
                 "layer": "ml",
                 "probability": round(ml_data["probability"], 4),
-                "ml_features": ml_data["features"],
+                "features": ml_data["features"],
                 "domain": ext.top_domain_under_public_suffix
             }
 
         # Latensi server
-        res["total_server_latency_ms"] = round((time.time() - start_time) * 1000, 2)
+        res["latency"] = round((time.time() - start_time) * 1000, 2)
         res["domain"] = registered_domain
         res["subdomain"] = ext.subdomain if ext.subdomain else "-"
 
@@ -96,5 +95,5 @@ async def predict_phishing(request: URLRequest, fastapi_req: Request):
             "probability": 0.0,
             "subdomain": "error",
             "domain": "error",
-            "total_server_latency_ms": round((time.time() - start_time) * 1000, 2),
+            "latency": round((time.time() - start_time) * 1000, 2),
         }
