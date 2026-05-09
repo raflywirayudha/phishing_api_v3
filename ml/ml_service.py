@@ -1,5 +1,5 @@
 import xgboost as xgb
-from utils.feature_extractor import extract_features
+from ml.feature_extractor import extract_features
 
 class PhishingPredictor:
     def __init__(self, model_path: str):
@@ -14,7 +14,6 @@ class PhishingPredictor:
 
     def predict(self, url: str):
         features = extract_features(url)
-
         feature_map = [
             {"Feature": name, "Value": val} 
             for name, val in zip(self.feature_names, features)
@@ -24,4 +23,4 @@ class PhishingPredictor:
         return {"probability": prob, "features": feature_map}
 
 # Inisialisasi model
-ml_engine = PhishingPredictor("models/model.json")
+ml_engine = PhishingPredictor("ml/model.json")

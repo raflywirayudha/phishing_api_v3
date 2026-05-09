@@ -7,66 +7,62 @@ from urllib.parse import urlparse
 feature_extractor = tldextract.TLDExtract(include_psl_private_domains=False)
 
 def extract_features(url_string):
-
     # Pra-pemrosesan string
     url_string = str(url_string).strip()
-    normalized_url = url_string.rstrip('/')
     parsed = urlparse(url_string)
-
     host = parsed.hostname or ""
     path = parsed.path or ""
     query = parsed.query or ""
 
     # 1. Panjang keseluruhan URL
-    url_len = len(normalized_url)
-
+    url_len = len(url_string)
+    
     # Ekstraksi domain menggunakan tldextract
     ext = feature_extractor(url_string)
     registered_domain = ext.top_domain_under_public_suffix or ""
-
+    
     # 2. Panjang domain utama (Registered Domain)
     dom_len = len(registered_domain)
-
+    
     # 3. Status IP Address (1 jika IP, 0 jika Nama Host)
     is_ip = 1 if re.match(r"^(?:\d{1,3}\.){3}\d{1,3}$", host) else 0
-    
+         
     # 4. Panjang TLD (Top Level Domain)
     tld_len = len(ext.suffix)
-
+    
     # 5. Jumlah subdomain 
     subdom_cnt = len(ext.subdomain.split('.')) if ext.subdomain else 0
-
-    # Inisialisasi penghitung karakter (Fitur 6, 7, 8, 9, 10, 11, 12, 13, 14, 19)
+    
+    # Inisialisasi penghitung karakter
     letter_cnt = 0
     digit_cnt = 0
     special_cnt = 0
     char_counts = {c: 0 for c in "=?&.-_/"} 
     char_freqs = {} 
 
-    for char in normalized_url:
+    for char in url_string:
         char_freqs[char] = char_freqs.get(char, 0) + 1
         if char in char_counts:
             char_counts[char] += 1
         if char.isalpha():
-            letter_cnt += 1         # 6. Jumlah huruf
+            letter_cnt += 1
         elif char.isdigit():
-            digit_cnt += 1          # 7. Jumlah angka
+            digit_cnt += 1 
         else:
-            special_cnt += 1        # 8. Jumlah karakter spesial
-
+            special_cnt += 1
 
     # 15, 16, 17. Perhitungan Rasio
     l_ratio = letter_cnt / url_len if url_len > 0 else 0
     d_ratio = digit_cnt / url_len if url_len > 0 else 0
     s_ratio = special_cnt / url_len if url_len > 0 else 0
-
+    
     # 20. Perhitungan Entropy (Tingkat keacakan URL)
     entropy = 0
     if url_len > 0:
         for count in char_freqs.values():
             p = count / url_len
             entropy -= p * math.log2(p)
-
+            
     features = [
         url_len,                                    # 1. Panjang keseluruhan URL
         dom_len,                                    # 2. Panjang domain utama (Registered Domain)

@@ -5,7 +5,7 @@ tranco_cache = {}
 async def check_tranco(client: httpx.AsyncClient, domain: str) -> bool:
     if domain in tranco_cache:
         return tranco_cache[domain]
-    
+        
     endpoint = f"https://tranco-list.eu/api/ranks/domain/{domain}"
     try:
         resp = await client.get(endpoint)
